@@ -13,6 +13,17 @@
     <div class="recommend-list">
       <h1 class="list-title"> 热门歌单推荐</h1>
       <ul>
+        <li v-for="(item, index) in distList" :key="index" class="item">
+          <div class="icon">
+            <img :src="item.imgurl" alt="pic" width="60" height='60'>
+          </div>
+          <div class="text">
+            <h2 class="name" v-html="item.creator.name"></h2>
+            <p class="desc" v-html="item.dissname"></p>
+          </div>
+        </li>
+      </ul>
+      <ul>
       </ul>
     </div>
    </div>
@@ -20,19 +31,28 @@
 </template>
 
 <script type="text/ecmascript-6">
-  import { getRecommend } from 'api/recommend'
+  import { getRecommend, getDiscList } from 'api/recommend'
   import { ERR_OK } from 'api/config'
   import Slider from 'src/base/slider/slider'
   export default {
     data() {
       return {
-        recommends: []
+        recommends: [],
+        distList: null
       }
     },
     created() {
+      this._getDistList()
       this._getRecommend()
     },
     methods: {
+      _getDistList() {
+        getDiscList().then(res => {
+          if (res.code === ERR_OK) {
+            this.distList = res.data.list
+          }
+        })
+      },
       _getRecommend() {
         getRecommend().then(res => {
           if (res.code === ERR_OK) {
@@ -57,7 +77,7 @@
     bottom: 0
     .recommend-content
       height: 100%
-      overflow: hidden
+      overflow: scroll
       .slider-wrapper
         position: relative
         width: 100%
