@@ -12,3 +12,6 @@
 -  <keep-alive>
       <router-view/>
     </keep-alive>  【路由包裹次标签可以保持缓存不用重新刷新】
+
+# loading: require('common/img/default.png') 【文件加载格式】
+# better 限时~只对第一个子元素实现滚动，父元素的高度固定，需要子元素撑开

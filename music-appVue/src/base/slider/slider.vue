@@ -13,8 +13,9 @@
 </template>
 
 <script type="text/ecmascript-6">
-  import BScroll from 'better-scroll'
   import { addClass } from 'common/js/dom'
+  import BScroll from 'better-scroll'
+  
   export default {
       data() {
         return {
@@ -34,8 +35,14 @@
           },
           interval: {
               type: Number,
-              default: 4000
+              default: 1000
           }
+      },
+      activated() {
+        this._play()
+      },
+      deactivated() {
+        clearTimeout(this.timer)
       },
       mounted() {
         setTimeout(() => {
@@ -85,6 +92,7 @@
             },
             click: true
           })
+          
           this.slider.on('scrollEnd', this._onScrollEnd)
 
           this.slider.on('touchend', () => {
@@ -122,7 +130,7 @@
   .slider
     min-height: 1px
     .slider-group
-      position: relative
+      // position: relative
       overflow: hidden
       white-space: nowrap
       .slider-item

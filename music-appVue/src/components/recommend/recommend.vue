@@ -1,32 +1,38 @@
 <template>
   <div class="recommend" ref="recommend">
-   <div class="recommend-content">
-    <div v-if="recommends.length" class="slider-wrapper">
-      <slider>
-        <div v-for="item in recommends" :key="item.id">
-          <a :href="item.linUrl">
-            <img :src="item.picUrl" alt="img">
-          </a>
+    <scroll ref="scroll" class="recommend-content" :data="distList">
+      <div>
+        <div v-if="recommends.length" class="slider-wrapper">
+          <slider>
+            <div v-for="item in recommends" :key="item.id">
+              <a :href="item.linkUrl">
+                <img class="needsclick" @load="loadImg" :src="item.picUrl" alt="img">
+              </a>
+            </div>
+          </slider>
         </div>
-      </slider>
-    </div>
-    <div class="recommend-list">
-      <h1 class="list-title"> 热门歌单推荐</h1>
-      <ul>
-        <li v-for="(item, index) in distList" :key="index" class="item">
-          <div class="icon">
-            <img :src="item.imgurl" alt="pic" width="60" height='60'>
-          </div>
-          <div class="text">
-            <h2 class="name" v-html="item.creator.name"></h2>
-            <p class="desc" v-html="item.dissname"></p>
-          </div>
-        </li>
-      </ul>
-      <ul>
-      </ul>
-    </div>
-   </div>
+        <div class="recommend-list">
+          <h1 class="list-title"> 热门歌单推荐</h1>
+          <ul>
+            <li v-for="(item, index) in distList" :key="index" class="item">
+              <div class="icon">
+                <img v-lazy="item.imgurl" alt="pic" width="60" height='60'>
+              </div>
+              <div class="text">
+                <h2 class="name" v-html="item.creator.name"></h2>
+                <p class="desc" v-html="item.dissname"></p>
+              </div>
+            </li>
+          </ul>
+          <ul>
+          </ul>
+        </div>
+      </div>
+      <div class="loading-container" v-show="!distList">
+        <loading></loading>
+      </div>
+    </scroll>
+   
   </div>
 </template>
 
@@ -34,6 +40,8 @@
   import { getRecommend, getDiscList } from 'api/recommend'
   import { ERR_OK } from 'api/config'
   import Slider from 'src/base/slider/slider'
+  import Scroll from 'src/base/scroll/scroll'
+  import Loading from 'src/base/loading/loading.vue'
   export default {
     data() {
       return {
@@ -46,10 +54,15 @@
       this._getRecommend()
     },
     methods: {
+      demo() {
+        console.log(2)
+      },
       _getDistList() {
         getDiscList().then(res => {
           if (res.code === ERR_OK) {
-            this.distList = res.data.list
+            setTimeout(() => {
+              this.distList = res.data.list
+            }, 1000)
           }
         })
       },
@@ -59,10 +72,18 @@
             this.recommends = res.data.slider
           }
         })
+      },
+      loadImg() {
+        if (!this.checkLoaded) {
+          this.$refs.scroll.refresh()
+          this.checkLoaded = true
+        }
       }
     },
     components: {
-      Slider
+      Slider,
+      Scroll,
+      Loading
     }
   }
 </script>
@@ -75,9 +96,12 @@
     width: 100%
     top: 88px
     bottom: 0
+    .test
+      height 600px
+      width: 300px
     .recommend-content
       height: 100%
-      overflow: scroll
+      overflow: hidden
       .slider-wrapper
         position: relative
         width: 100%
