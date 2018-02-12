@@ -1,12 +1,17 @@
 <template>
   <div class="singer" ref="singer">
-    singer
+    <list-view :data="this.singers" @select="selectSinger"></list-view>
+    <router-view></router-view>
   </div>
 </template>
 
 <script type="text/ecmascript-6">
 import { getSingerList } from 'api/singer.js'
 import { ERR_OK } from 'api/config'
+import normalize from 'common/js/normalize.js'
+import ListView from 'src/base/listview/listview'
+import { mapMutations } from 'vuex'
+
   export default {
     data() {
       return {
@@ -18,14 +23,67 @@ import { ERR_OK } from 'api/config'
     },
 
     methods: {
+      ...mapMutations({
+        setSinger: 'SET_SINGER'
+      }),
+      selectSinger(item) {
+        this.$router.push({
+          path: `/singer/${item.id}`
+        })
+        this.setSinger(item)
+      },
       _getSingers() {
         getSingerList().then(res => {
           if (res.code === ERR_OK) {
-            this.singers = res.data.list
-            console.log(this.singers)  
+            setTimeout(() => {
+              this.singers = this._normalizeList(res.data.list)
+            }, 1000)
           }
         })
+      },
+      _normalizeList(list) {
+        let map = {
+          hot: {
+            title: '热门',
+            items: []
+          }
+        }
+        list.forEach((item, index) => {
+          if (index < 10) {
+            map.hot.items.push(normalize(item))
+          }
+          let key = item.Findex
+          if (!map[key]) {
+            map[key] = {
+              title: key,
+              items: []
+            }
+            map[key].items.push(normalize(item))
+          } else {
+            map[key].items.push(normalize(item))
+          }
+        })
+        let hot = []
+        let ret = []
+        for (let key in map) {
+          let val = map[key]
+          if (val.title.match(/[a-zA-z]/)) {
+            ret.push(val)
+          } else {
+            if (val.title === '热门') {
+              hot.push(val)
+            }
+          }
+        }
+        
+        ret.sort((a, b) => {
+          return a.title.charCodeAt(0) - b.title.charCodeAt(0)
+        })
+        return hot.concat(ret)
       }
+    },
+    components: {
+      ListView
     }
   }
 </script>

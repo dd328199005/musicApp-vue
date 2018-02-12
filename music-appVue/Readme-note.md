@@ -15,3 +15,10 @@
 
 # loading: require('common/img/default.png') 【文件加载格式】
 # better 限时~只对第一个子元素实现滚动，父元素的高度固定，需要子元素撑开
+
+- charCodeAt() 方法可返回指定位置的字符的 Unicode 编码
+
+- e.touches [获取触摸点]
+# client 和 page 区别在于滚动条是否包含在内
+
+# import * as types 未见用法~
