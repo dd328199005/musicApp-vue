@@ -6,7 +6,8 @@
           <slider>
             <div v-for="item in recommends" :key="item.id">
               <a :href="item.linkUrl">
-                <img class="needsclick" @load="loadImg" :src="item.picUrl" alt="img">
+                <img class="needsclick" @load="loadImg" :src="item.picUrl" alt="img"> 
+                <!-- fastclick 会阻止默认事件加needsclick后解锁 -->
               </a>
             </div>
           </slider>

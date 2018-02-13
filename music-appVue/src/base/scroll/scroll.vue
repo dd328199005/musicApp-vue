@@ -39,7 +39,7 @@
             })
             if (this.listenScroll) {
               this.scroll.on('scroll', pos => {
-                this.$emit('scroll', pos)
+                this.$emit('scroll', pos) // 触发组件本身的事件
               })
             }
           },

@@ -19,6 +19,14 @@
 - charCodeAt() 方法可返回指定位置的字符的 Unicode 编码
 
 - e.touches [获取触摸点]
-# client 和 page 区别在于滚动条是否包含在内
+# touch时间的 client 和 page 区别在于滚动条是否包含在内
 
 # import * as types 未见用法~
+
+# 数据有特殊字符的话文本绑定可以用v-html
+#  $el是针对组件的根元素
+# ：id路由配置
+# 组件在外部可以通过 $refs.el.xxxx调用
+
+# transform 的class会动态的加入到根目录中
+# router-link-active 会动态加入到router-link中
