@@ -30,3 +30,5 @@
 
 # transform 的class会动态的加入到根目录中
 # router-link-active 会动态加入到router-link中
+
+# @click.stop 阻止冒泡
