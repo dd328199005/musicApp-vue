@@ -1,4 +1,4 @@
-import * as types from './mutation-types' // 到处所有的玩意
+import * as types from './mutation-types' // 导出所有的玩意
 
 const mutations = {
   [types.SET_SINGER](state, singer) {

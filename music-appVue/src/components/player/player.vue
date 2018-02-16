@@ -19,32 +19,57 @@
             </div>
             <div class="middle">
                 <div class="middle-l">
-                <div class="cd-wrapper" ref="cdWrapper">
+                  <div class="cd-wrapper" ref="cdWrapper">
                     <div class="cd"
                       :class="cdRotate"
                     >
                       <img class="image" :src="currentSong.image">
                     </div> 
+                  </div>
                 </div>
-                </div>
+                <scroll class="middle-r" ref="lyricList" :data="currentLyric && currentLyric.lines">
+                  <div class="lyric-wrapper">
+                    <div v-if="currentLyric">
+                      <p ref="lyricLine" class="text"
+                        v-for="(line, index) in currentLyric.lines"
+                        :key="index"
+                        :class="{'current': currentLineNum === index}"
+                      >
+                        {{line.txt}}
+                      </p>
+                    </div>
+                  </div>
+                </scroll>
             </div>
             <div class="bottom">
+                <div class="progress-wrapper">
+                  <span class="time time-l">{{format(this.currentTime)}}</span>
+                  <div class="progress-bar-wrapper">
+                    <progress-bar 
+                      :percent="percent"
+                      @percentChange="onProgressChange"
+                    ></progress-bar>
+                  </div>
+                  <span class="time time-r">{{format(this.currentSong.duration)}}</span>
+                </div>
                 <div class="operators">
-                    <div class="icon i-left">
-                        <i class="icon-sequence"></i>
+                    <div class="icon i-left" :class="disableClass"
+                      @click="changeMode"
+                    >
+                        <i :class="modeIcon"></i>
                     </div>
-                    <div class="icon i-left">
-                        <i class="icon-prev"></i>
+                    <div class="icon i-left" :class="disableClass">
+                        <i class="icon-prev" @click="prev"></i>
                     </div>
-                    <div class="icon i-center">
+                    <div class="icon i-center" :class="disableClass">
                         <i :class="playingIcon"
                           @click="togglePlaying"
                         ></i>
                     </div>
-                    <div class="icon i-right">
-                        <i class="icon-next"></i>
+                    <div class="icon i-right" :class="disableClass">
+                        <i class="icon-next" @click="next"></i>
                     </div>
-                    <div class="icon i-right">
+                    <div class="icon i-right" :class="disableClass">
                         <i class="icon-not-favorite"></i>
                     </div>
                 </div>
@@ -63,23 +88,46 @@
               <p class="desc" v-html="currentSong.singer"></p>
             </div>
             <div class="control">
-              <i :class="miniIcon"
-                @click.stop="togglePlaying"
-              ></i>
+              <progress-cricle :radius="radius" :percent="percent">
+                <i :class="miniIcon" class="icon-mini"
+                  @click.stop="togglePlaying"
+                ></i>
+              </progress-cricle>
             </div>
             <div class="control">
               <i class="icon-playlist"></i>
             </div>
         </div>
       </transition>
-      <audio ref="audio" :src='currentSong.url'></audio>
+      <audio ref="audio" :src='currentSong.url'
+        @error="error"
+        @canplay="ready"
+        @timeupdate="updateTime"
+        @ended="end"
+      ></audio>
   </div>
 </template>
 
 <script type="text/ecmascript-6">
   import { mapGetters, mapMutations } from 'vuex'
   import animations from 'create-keyframe-animation'
+  import ProgressBar from 'src/base/progress-bar/progress-bar'
+  import ProgressCricle from 'src/base/progress-cricle/progress-cricle'
+  import { playMode } from 'common/js/config'
+  import { shuffle } from 'common/js/util'
+  import LyricParser from 'lyric-parser' // 歌词编译
+  import Scroll from 'src/base/scroll/scroll'
+
   export default {
+    data() {
+      return {
+        songReady: false,
+        currentTime: 0,
+        radius: 32,
+        currentLyric: null,
+        currentLineNum: 0
+      }
+    },
     computed: {
         playingIcon() {
           return this.playing ? 'icon-pause' : 'icon-play'
@@ -90,25 +138,148 @@
         cdRotate() {
           return this.playing ? 'play' : 'play pause'
         },
+        disableClass() {
+          return this.songReady ? '' : 'disable'
+        },
+        percent() {
+          return this.currentTime / this.currentSong.duration
+        },
+        modeIcon() {
+          return this.mode === playMode.sequence ? 'icon-sequence' : this.mode === playMode.loop ? 'icon-loop'
+            : 'icon-random'
+        },
         ...mapGetters([
             'fullScreen',
             'playList',
             'currentSong',
-            'playing'
+            'playing',
+            'currentIndex',
+            'mode',
+            'sequenceList'
         ])
     },
     watch: {
-      currentSong() {
+      currentSong(newVal, oldVal) {
+        if (newVal.id === oldVal.id) {
+          return
+        }
         this.$nextTick(() => {
           this.$refs.audio.play() // 类似settimeout 20
+          this.getLyric()
         })
       }
     },
     methods: {
         ...mapMutations({
           setFullScreen: 'SET_FULL_SCREEN',
-          setPlayingState: 'SET_PLAYING_STATE'
+          setPlayingState: 'SET_PLAYING_STATE',
+          setCurrentIndex: 'SET_CURRENT_INDEX',
+          setPlayMode: 'SET_PLAY_MODE',
+          setPlayList: 'SET_PLAYLIST'
         }),
+        getLyric() {
+          this.currentSong._getLyric().then(lyric => {
+            this.currentLyric = new LyricParser(lyric, this.handleLyric)
+            if (this.playing) {
+              this.currentLyric.play()
+            }
+          })
+        },
+        handleLyric({lineNum, txt}) {
+          this.currentLineNum = lineNum
+          if (lineNum > 5) {
+            let lineEl = this.$refs.lyricLine[lineNum - 5]
+            this.$refs.lyricList.scrollToElement(lineEl, 1000)
+          } else {
+            this.$refs.lyricList.scrollTo(0, 0, 1000)
+          }
+        },
+        end() {
+          if (this.mode === playMode.loop) {
+            this.loop()
+          } else {
+            this.next()
+          }
+        },
+        loop() {
+          this.$refs.audio.currentTime = 0
+          this.$refs.audio.play()
+        },
+        changeMode() {
+          let mode = (this.mode + 1) % 3
+          this.setPlayMode(mode)
+          let list = null
+          if (mode === playMode.random) {
+            list = shuffle(this.sequenceList)
+          } else {
+            list = this.sequenceList
+          }
+          this.reSetCurrentIndex(list)
+          this.setPlayList(list)
+        },
+        reSetCurrentIndex(list) {
+          let index = list.findIndex((item) => {
+            return item.id === this.currentSong.id
+          })
+          this.setCurrentIndex(index)
+        },
+        onProgressChange(percent) {
+          this.$refs.audio.currentTime = this.currentSong.duration * percent
+          if (!this.playing) {
+            this.togglePlaying()
+          }
+        },
+        format(interval) {
+          interval = Math.floor(interval)
+          const minute = interval / 60 | 0 // 类似math.floor方法 
+          const second = interval % 60
+          return `${this._pad(minute)}:${this._pad(second)}`
+        },
+        _pad(num, n = 2) {
+          let len = num.toString().length
+          while (len < n) {
+            num = '0' + num 
+            len++
+          }
+          return num
+        },
+        updateTime(e) {
+          this.currentTime = e.target.currentTime
+        },
+        error() {
+          this.songReady = true
+        },
+        ready() {
+          this.songReady = true
+        },
+        prev() {
+          if (!this.songReady) {
+            return
+          }
+          let index = this.currentIndex - 1
+          if (index < 0) {
+            index = this.playList.length - 1
+          }
+          this.setCurrentIndex(index)
+          if (!this.playing) {
+            this.togglePlaying()
+          }
+          this.songReady = false
+        },
+        next() {
+          if (!this.songReady) {
+            return
+          }
+          let index = this.currentIndex + 1
+          if (index === this.playList.length) {
+            index = 0
+          }
+          this.setCurrentIndex(index)
+          if (!this.playing) {
+            this.togglePlaying()
+          }
+          this.songReady = false
+        },
         back() {
           this.setFullScreen(false)
         },
@@ -153,6 +324,9 @@
           this.$refs.cdWrapper.style.transform = ''
         },
         togglePlaying() {
+          if (!this.songReady) {
+            return
+          }
           this.setPlayingState(!this.playing)
           this.playing ? this.$refs.audio.play() : this.$refs.audio.pause()
         },
@@ -171,6 +345,11 @@
             scale
           }
         }
+    },
+    components: {
+      ProgressBar,
+      ProgressCricle,
+      Scroll
     }
   }
 </script>

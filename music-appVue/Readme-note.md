@@ -19,7 +19,7 @@
 - charCodeAt() 方法可返回指定位置的字符的 Unicode 编码
 
 - e.touches [获取触摸点]
-# touch时间的 client 和 page 区别在于滚动条是否包含在内
+# touch时间的 client 和 page 区别在于滚动条是否包含在内 client 最大值不超过浏览器宽高
 
 # import * as types 未见用法~
 
@@ -32,3 +32,11 @@
 # router-link-active 会动态加入到router-link中
 
 # @click.stop 阻止冒泡
+
+# num.toString().length 数字转字符串
+
+# 接口的offsetX只读属性MouseEvent在该事件与目标节点的填充边之间的鼠标指针的X坐标中提供偏移量。 
+
+# getBoundingClientRect().left
+
+
