@@ -33,7 +33,6 @@
         <loading></loading>
       </div>
     </scroll>
-   
   </div>
 </template>
 
@@ -43,6 +42,8 @@
   import Slider from 'src/base/slider/slider'
   import Scroll from 'src/base/scroll/scroll'
   import Loading from 'src/base/loading/loading.vue'
+  import { playListMixin } from 'common/js/mixin'
+
   export default {
     data() {
       return {
@@ -55,6 +56,12 @@
       this._getRecommend()
     },
     methods: {
+      handlePlayListMixin(playList) {
+        if (playList.length > 0) {
+          this.$refs.recommend.style.bottom = '60px'
+          this.$refs.scroll.refresh()
+        }
+      },
       demo() {
         console.log(2)
       },
@@ -85,7 +92,8 @@
       Slider,
       Scroll,
       Loading
-    }
+    },
+    mixins: [playListMixin]
   }
 </script>
 

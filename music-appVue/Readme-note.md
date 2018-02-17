@@ -28,7 +28,7 @@
 # ：id路由配置
 # 组件在外部可以通过 $refs.el.xxxx调用
 
-# transform 的class会动态的加入到根目录中
+# transiton 的class会动态的加入到根目录中
 # router-link-active 会动态加入到router-link中
 
 # @click.stop 阻止冒泡
@@ -39,4 +39,16 @@
 
 # getBoundingClientRect().left
 
+# apply 第二个参数可以是arguments
 
+
+# player需要借助的几个库   
+{
+  - lyric-parser  歌词编译
+  - create-keyframe-animation   动画生成库
+  - 和transition 的过渡钩子
+}
+
+- mixins 机制： 组件方法优先
+
+# throw new Error() 让控制台抛出错误

@@ -1,6 +1,6 @@
 <template>
   <div class="singer" ref="singer">
-    <list-view :data="this.singers" @select="selectSinger"></list-view>
+    <list-view :data="this.singers" @select="selectSinger" ref="listview"></list-view>
     <router-view></router-view>
   </div>
 </template>
@@ -11,7 +11,7 @@ import { ERR_OK } from 'api/config'
 import normalize from 'common/js/normalize.js'
 import ListView from 'src/base/listview/listview'
 import { mapMutations } from 'vuex'
-
+import { playListMixin } from 'common/js/mixin'
   export default {
     data() {
       return {
@@ -26,6 +26,12 @@ import { mapMutations } from 'vuex'
       ...mapMutations({
         setSinger: 'SET_SINGER'
       }),
+      handlePlayListMixin(playList) {
+        if (playList.length > 0) {
+          this.$refs.singer.style.bottom = '60px'
+          this.$refs.listview.refresh()
+        }
+      },
       selectSinger(item) {
         this.$router.push({
           path: `/singer/${item.id}`
@@ -84,7 +90,8 @@ import { mapMutations } from 'vuex'
     },
     components: {
       ListView
-    }
+    },
+    mixins: [playListMixin]
   }
 </script>
 

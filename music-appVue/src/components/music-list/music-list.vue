@@ -37,6 +37,7 @@
   import { prefixStyle } from 'common/js/dom'
   import Loading from 'src/base/loading/loading'
   import { mapActions } from 'vuex'
+  import { playListMixin } from 'common/js/mixin'
 
   const STATE_HEIGHT = 40
   const transform = prefixStyle('transform')
@@ -106,6 +107,12 @@
       }
     },
     methods: {
+      handlePlayListMixin(playList) {
+        if (playList.length > 0) {
+          this.$refs.list.$el.style.bottom = '60px'
+          this.$refs.list.refresh()
+        }
+      },
       random() {
         this.randomPlay({list: this.songs})
       },
@@ -123,14 +130,15 @@
         this.$router.go(-1)
       },
       scroll(pos) {
-          this.scrollY = -pos.y
+        this.scrollY = -pos.y
       }
     },
     components: {
       Scroll,
       SongList,
       Loading
-    }
+    },
+    mixins: [playListMixin]
   }
  
 </script>
