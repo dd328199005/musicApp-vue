@@ -47,6 +47,7 @@
   - lyric-parser  歌词编译
   - create-keyframe-animation   动画生成库
   - 和transition 的过渡钩子
+  - js-base decode  编码
 }
 
 - mixins 机制： 组件方法优先
