@@ -1,5 +1,5 @@
 # Vue Music webApp
-
+- 预览链接<a>http://ustbhuangyi.com/music/#/recommend</a>
 
 <p align="center"><a href="https://music-vue.n-y.io" target="_blank"><img width="300"src="https://raw.githubusercontent.com/nanyang24/music-vue/master/img/Apple_Music_Blur.png"></a></p>
 <p align="center">Vue 音乐App、数据抓取自QQ音乐</p>
