@@ -14,11 +14,6 @@
   <a href="https://github.com/hilongjw/vue-lazyload"><img src="https://img.shields.io/badge/vue--lazyload-v1.1.4-yellow.svg" alt="vue-lazyload"></a>
 </p>
 
-
-#### [音乐项目 music app 知识点总结](https://github.com/nanyang24/music-vue/blob/master/conclusion.md)
-
-
-
 ## 主要技术栈
 
 【前端】
