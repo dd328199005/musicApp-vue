@@ -17,16 +17,6 @@
 
 #### [音乐项目 music app 知识点总结](https://github.com/nanyang24/music-vue/blob/master/conclusion.md)
 
-## 在线演示
-
-<div align=center><a href="https://music-vue.n-y.io" target=_blank>在线预览戳我</a></div>
-<div align=center>为了更好的体验，请用开发者工具模拟移动端体验</div>
-<br>
-<div align=center>
-<img src="https://raw.githubusercontent.com/nanyang24/music-vue/master/img/music-vue.png" width="20%">
-<div>扫二维码在手机上查看</div>
-<div>效果更好</div>
-</div>
 
 
 ## 主要技术栈
